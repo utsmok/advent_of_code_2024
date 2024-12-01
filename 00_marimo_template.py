@@ -29,7 +29,6 @@ def __(mo):
         options=[str(i) for i in range(32)], value="1", label="Which day?"
     )
     day_select
-
     return (day_select,)
 
 
@@ -70,11 +69,8 @@ def __(
 
     ## Solution
 
-    The answer to this puzzle is:
-
     {determine_answer(input_file)}
     """)
-
     return (
         base_dir,
         day,
@@ -93,7 +89,7 @@ def __(Path, Tuple, __file__):
         """
         Setup the environment for the given day and part of the puzzle.
         This includes setting the input file path, the description file path, and enabling packrat parsing.
-        
+
         Parameters
         ----------
         day : int
@@ -109,10 +105,15 @@ def __(Path, Tuple, __file__):
         base_dir = Path(__file__).parent
         day_dir = base_dir / Path(f'{day:02d}')
         input_file = day_dir / Path(f'input_{part}.txt')
+
+        if not input_file.exists():
+            input_file = day_dir / Path(f'input.txt')
+            if not input_file.exists():
+                raise FileNotFoundError(f"No input file found in {day_dir}")
+                
         description_file = day_dir / Path(f'description_{part}.txt')
         description_text = description_file.read_text()
         return base_dir, day_dir, input_file, description_file, description_text
-
     return (dir_setup,)
 
 
@@ -141,22 +142,22 @@ def __(Any, Path, pp):
 
 
 @app.cell
-def __(Any):
-    def determine_answer(parsed_input: Any) -> str:
+def __(Path):
+    def determine_answer(input_file: Path) -> str:
         """
         Determine the answer to the puzzle given the parsed input data.
         Overload this function for each question.
 
         Parameters
         ----------
-        parsed_input : Any
-            The data parsed from the input file in a suitable format.
+        input_file : Path
+            The input file to be parsed.
 
         Returns
         -------
         str
             A string containing the formatted answer to the puzzle.
-        """    
+        """
         answer = 'Implement this function!'
         return answer
     return (determine_answer,)

@@ -155,12 +155,13 @@ def __(Any, parse_input):
         col_1, col_2 = parse_input(input_file)
         col_1.sort()
         col_2.sort()
-
-        # 2. Iterate over pairs, calculate distance between each pair, sum all distances
-        total_dist = 0
-        for num_1, num_2 in zip(col_1, col_2):
-            total_dist += abs(num_1 - num_2)
-        answer = f"The sum of distances between the pairs is {total_dist}!"
+        total_sim = 0
+        for num in col_1:
+            while num in col_2:
+                total_sim += num
+                col_2.remove(num)
+        
+        answer = f"The sum of similarities is {total_sim}!"
         return answer
     return (determine_answer,)
 
