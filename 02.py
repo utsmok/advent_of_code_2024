@@ -23,144 +23,96 @@ def __():
 
 
 @app.cell
-def __(mo):
-    # Setup things
-    day_select = mo.ui.dropdown(
-        options=[str(i) for i in range(32)], value="1", label="Which day?"
-    )
-    day_select
-    return (day_select,)
-
-
-@app.cell
-def __(mo):
-    part_select = mo.ui.switch(label='Part 2?')
-    part_select
-    return (part_select,)
-
-
-@app.cell
-def __(
-    day_select,
-    determine_answer,
-    dir_setup,
-    mo,
-    parse_input,
-    part_select,
-    pp,
-):
-    day = int(day_select.value)
-    part = 2 if part_select.value else 1
-    base_dir, day_dir, input_file, description_file, description_text = dir_setup(day, part)
-    pp.ParserElement.enablePackrat()
-    parsed_input = parse_input(input_file)
+def __(answer_1_str, answer_2_str, day, mo):
     mo.md(f"""
-    # Advent of Code 2024, Day {day}, Part {part}
+    # Advent of Code 2024, Day {day}
+    [Description](https://adventofcode.com/2024/day/{day})
+    ### Solution 1
 
-    ## Description
+    {answer_1_str}
 
-    {description_text}
+    ### Solution 2
 
-    ## Input file
+    {answer_2_str}
 
-    The input file is located at {input_file}. The first 10 rows of parsed input looks like this:
-
-    {parsed_input}
-
-    ## Solution
-
-    {determine_answer(input_file)}
     """)
-    return (
-        base_dir,
-        day,
-        day_dir,
-        description_file,
-        description_text,
-        input_file,
-        parsed_input,
-        part,
-    )
+    return
 
 
 @app.cell
-def __(Path, Tuple, __file__):
-    def dir_setup(day: int, part: int) -> Tuple[Path, Path, Path, Path, str]:
-        """
-        Setup the environment for the given day and part of the puzzle.
-        This includes setting the input file path, the description file path, and enabling packrat parsing.
-
-        Parameters
-        ----------
-        day : int
-            The day of the puzzle, ranging from 1 to 31.
-        part : int
-            The part of the puzzle, either 1 or 2.
-
-        Returns
-        -------
-        Tuple[Path, Path, Path, Path, str]
-            A tuple containing the base directory, the day directory, the input file path, the description file path, and the description text.
-        """    
-        base_dir = Path(__file__).parent
-        day_dir = base_dir / Path(f'{day:02d}')
-        input_file = day_dir / Path(f'input_{part}.txt')
-
-        if not input_file.exists():
-            input_file = day_dir / Path(f'input.txt')
-            if not input_file.exists():
-                raise FileNotFoundError(f"No input file found in {day_dir}")
-                
-        description_file = day_dir / Path(f'description_{part}.txt')
-        description_text = description_file.read_text()
-        return base_dir, day_dir, input_file, description_file, description_text
-    return (dir_setup,)
+def __(determine_answers, parse_input):
+    day = 2
+    data = parse_input(day)
+    answer_1_str, answer_2_str = determine_answers(data)
+    return answer_1_str, answer_2_str, data, day
 
 
 @app.cell
-def __(Any, Path, pp):
-    # Parse input
-    def parse_input(input_file: Path) -> Any:
+def __(Path, __file__, pp):
+    def parse_input(day: int) -> list[list[int]]:
         """
         Parse the input file and return the data in a suitable format for this question.
-        Use pyparsing to do this, by creating a parser object and using the function parse_file(input_file).
 
         Parameters
         ----------
-        input_file : Path
-            The path to the input file, which should be a .txt file containing the input data.
+        day: int
+            The day of the puzzle, ranging from 1 to 31.
 
         Returns
         -------
-        Any
-            The data parsed from the input file in a suitable format. Overload this function & type for each question.
-        """    
-        parser = pp.nums
-        parsed_input = 'Implement this function!'    
-        return parsed_input
+        list[list[int]]:
+            A list containing each report. Each report is a list of ints. 
+        """
+
+        base_dir = Path(__file__).parent
+        day_dir = base_dir / Path(f'{day:02d}')
+        input_file = day_dir / Path(f'input.txt')
+        line_parser = pp.OneOrMore(pp.Word(pp.nums).setParseAction(lambda t: int(t[0])))
+        multi_line_parser = pp.OneOrMore(line_parser)
+        parsed_results = multi_line_parser.parse_file(input_file)
+
+        print(len(parsed_results))
+        print(parsed_results)
+        return parsed_results
     return (parse_input,)
 
 
 @app.cell
-def __(Path):
-    def determine_answer(input_file: Path) -> str:
+def __():
+    def determine_answers(data: list[list[int]]) -> tuple[str,str]:
         """
-        Determine the answer to the puzzle given the parsed input data.
-        Overload this function for each question.
+        Calculates the answers to both parts of the puzzle, and then returns them as formatted strings.
 
         Parameters
         ----------
-        input_file : Path
-            The input file to be parsed.
-
+        data: list[list[int]]
+            list containing each report. Each report is a list of ints
         Returns
         -------
-        str
-            A string containing the formatted answer to the puzzle.
+        tuple[str,str]
+            A tuple containing two strings with the answers to the first and second parts of the puzzle.
         """
-        answer = 'Implement this function!'
-        return answer
-    return (determine_answer,)
+
+        def determine_answer_1(data: list[list[int]]) -> int:
+            safe_report_count: int = 0 
+            return safe_report_count
+
+        def determine_answer_2(data: list[list[int]]) -> int:
+            unknown = 0
+            return unknown
+
+        answer_1 = determine_answer_1(data)
+        answer_2 = determine_answer_2(data) 
+        answer_1_str = f"""
+        --algorithm 1--
+
+        --answer 1 explain-- is **{answer_1}**. 
+        """
+        answer_2_str = f"""
+        --algorithm 2--
+        --answer 2 explain-- **{answer_2}**."""    
+        return answer_1_str, answer_2_str
+    return (determine_answers,)
 
 
 if __name__ == "__main__":
